@@ -1,8 +1,7 @@
 
 const genericStyle = "transition: all 2s ease; position: absolute; width: 50px; height: 50px";
 
-const vw = window.innerWidth;
-const vh = window.innerHeight;
+const viewport = new Vector(window.innerWidth, window.innerHeight);
 
 function Vector (x, y) {
     this.x = Number(x) || (Math.random() * 2) - 1;
@@ -10,21 +9,43 @@ function Vector (x, y) {
 }
 
 // Gets coordinates at which this vector intersects with the viewport
-function getLimit(thisVector, vh, vw) {
-    // Top: 0
-    // Right: 1
-    // Bottom: 2
-    // Left: 3
-    const ratio = thisVector.y * (vw / vh);
-    let result;
-    if ((thisVector.x < ratio) && (thisVector.x > thisVector.y * ratio)) {
-        (thisVector.y > 0) && (result = 0);
-        (thisVector.y < 0) && (result = 2);
+function getLimit(thisVector, quadrilateral) {
+    // Functions to find the limit depending on the side it intersects with first 
+    const functions = {
+        top: () => {
+            let x = thisVector.x * (quadrilateral.y / 2) / thisVector.y;
+            return new Vector(x, quadrilateral.y / 2);
+        },
+        bot: () => {
+            let x = thisVector.x * (-quadrilateral.y / 2) / thisVector.y;
+            return new Vector(x, -quadrilateral.y / 2);
+        },
+        rgt: () => {
+            let y = thisVector.y * (quadrilateral.x / 2) / thisVector.x;
+            return new Vector(quadrilateral.x / 2, y);
+        },
+        lft: () =>  {
+            let y = thisVector.y * (-quadrilateral.x / 2) / thisVector.x;
+            return new Vector(-quadrilateral.x / 2, y);
+        }
     }
-    (thisVector.x > 0) && (result = 1);
-    (thisVector.x < 0) && (result = 3);
-    return result;
+
+    // This finds which side the vector will intersect with first
+    const ratio = thisVector.y * (quadrilateral.x / quadrilateral.y);
+    
+    let side;
+    if ((thisVector.x < ratio) && (thisVector.x > thisVector.y * ratio)) {
+        (thisVector.y > 0) && (side = "top");
+        (thisVector.y < 0) && (side = "bot");
+    }
+    (thisVector.x > 0) && (side = "rgt");
+    (thisVector.x < 0) && (side = "lft");
+    
+    return functions[side]();
 }
+
+// Gets distance between two points
+function getDistance (vec1, vec2)
 
 function Sticker (path, vector, dist1, dist2) {
 
