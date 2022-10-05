@@ -4,8 +4,9 @@ const genericStyle =
 const containerSelector = "body";
 const targetSelector = "body";
 
-const container = document.querySelector(containerSelector)
-const containerVec = new Vector(window.innerWidth, window.innerHeight);
+const target = document.querySelector(targetSelector);
+const container = document.querySelector(containerSelector);
+const containerVec = new Vector(container.offsetWidth, container.offsetHeight);
 
 function setup() {
     const button = document.querySelector("#mainBut");
@@ -78,8 +79,20 @@ function getRandDistance(max) {
 function calcCoords(vec, dist, offset) {
     // First calculate relative position
     const rel = new Vector(vec.x * dist + offset.x, vec.y * dist + offset.y);
-    const abs = new Vector(rel.x + containerVec.x / 2, rel.y + containerVec.y / 2);
+    const abs = new Vector(
+        rel.x + containerVec.x / 2,
+        rel.y + containerVec.y / 2
+    );
     return abs;
+}
+
+// Returns CSS Text needed to get an element to the specified coords
+function coordsToStyle(pos) {
+    let result = "position: absolute; left: ";
+    result += pos.x + "px";
+    result += "bottom: ";
+    result += pos.y + "px";
+    return result;
 }
 
 function Vector(x, y) {
@@ -93,22 +106,25 @@ function Vector(x, y) {
         return Math.sqrt(x ** x + y ** 2);
     };
     // Returns a collinear unit vector
-    this.unitVector = function () {
+    this.toUnitVector = function () {
         return new Vector(this.x / this.length, this.y / this.length);
     };
 }
 
+// A Sticker is defined by a vccector and a distance, the vector starts at the center of the parent element, and the distance is the point along that vector at which the Sticker is found
 function Sticker(path, vector, offset) {
     this.path = path;
+    this.isShown = false;
 
     this.vector = vector || new Vector();
-    this.vector = this.vector.unitVector();
+    this.vector = this.vector.toUnitVector();
 
     this.limit = getLimit(this.vector, containerVec);
 
     this.dist1 = getRandDistance(this.limit.length);
     this.dist2 = this.dist1 + this.limit.length;
 
+    // A random offset to make it feel less repetitive
     this.offset =
         offset ||
         new Vector(
@@ -116,7 +132,51 @@ function Sticker(path, vector, offset) {
             Math.random * (this.limit.length - this.dist1)
         );
 
-    this.init = "CUM";
+    this.coords1 = calcCoords(this.vector, this.dist1, this.offset);
+    this.coords2 = calcCoords(this.vector, this.dist2, this.offset);
+
+    this.style = "transition: all 2s ease; width: 50px; height: 50px";
+
+    // This adds the image to the DOM
+    this.init = function () {
+        const initialStyle = this.style + coordsToStyle(this.coords2);
+        const altString = `${this.path.split(".")[0]} Sticker.`;
+        addToDOM(
+            "img",
+            targetSelector,
+            initialStyle,
+            ["src", this.path],
+            ["alt", altString]
+        );
+    };
+
+    // This updates the shown image
+    this.update = function () {
+        const currentStyle =
+            this.style +
+            (this.isShown
+                ? coordsToStyle(this.coords1)
+                : coordsToStyle(this.coords2));
+        const img = document.querySelector("img[src = this.path]");
+        img.style.cssText = currentStyle;
+    };
+
+    this.hide = function () {
+        this.shown = false;
+        this.update();
+    };
+
+    this.show = function () {
+        this.shown = true;
+        this.update();
+    };
+
+    this.switch = function () {
+        if (this.isShown) {
+            this.hide();
+        }
+        this.show();
+    };
 }
 
 setup();
