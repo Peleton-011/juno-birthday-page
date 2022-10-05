@@ -1,28 +1,17 @@
 const genericStyle =
     "transition: all 2s ease; position: absolute; width: 50px; height: 50px";
 
-const viewport = new Vector(window.innerWidth, window.innerHeight);
+const containerSelector = "body";
+const targetSelector = "body";
+
+const container = document.querySelector(containerSelector)
+const containerVec = new Vector(window.innerWidth, window.innerHeight);
 
 function setup() {
     const button = document.querySelector("#mainBut");
     button.addEventListener("click", (e) => {
         console.log(new Sticker("cum"));
     });
-}
-
-function createTestDiv() {
-    const div = document.createElement("div");
-    const body = document.querySelector("body");
-    div.classList.add("test");
-    div.style.cssText = "color: blue;";
-    body.appendChild(div);
-}
-
-function switchState(willHide) {
-    const div = document.querySelector(".test");
-    div || createTestDiv();
-    div.style.cssText =
-        "transition: all 2s ease; position: absolute; left: 10vw;";
 }
 
 // Adds an element to the DOM of the tag "tag", as a child of the node which fits "selector", with the inline style "style"
@@ -89,7 +78,7 @@ function getRandDistance(max) {
 function calcCoords(vec, dist, offset) {
     // First calculate relative position
     const rel = new Vector(vec.x * dist + offset.x, vec.y * dist + offset.y);
-    const abs = new Vector(rel.x + viewport.x / 2, rel.y + viewport.y / 2);
+    const abs = new Vector(rel.x + containerVec.x / 2, rel.y + containerVec.y / 2);
     return abs;
 }
 
@@ -115,7 +104,7 @@ function Sticker(path, vector, offset) {
     this.vector = vector || new Vector();
     this.vector = this.vector.unitVector();
 
-    this.limit = getLimit(this.vector, viewport);
+    this.limit = getLimit(this.vector, containerVec);
 
     this.dist1 = getRandDistance(this.limit.length);
     this.dist2 = this.dist1 + this.limit.length;

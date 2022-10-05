@@ -5,17 +5,3 @@ body {
     justify-content: center;
     align-items: center;
 }
-
-#mainBut {
-
-}
-
-.test {
-    background-color: blue;
-    min-width: 50px;
-    min-height: 50px;
-}
-
-.test::after {
-    content: "Test div";
-}
