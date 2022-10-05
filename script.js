@@ -3,16 +3,26 @@ const genericStyle =
 
 const viewport = new Vector(window.innerWidth, window.innerHeight);
 
-function Vector(x, y) {
-    this.x = Number(x) || Math.random() * 2 - 1;
-    this.y = Number(y) || Math.random() * 2 - 1;
-    // Gets distance to another vector
-    this.length = Math.sqrt(this.x ** 2 + this.y ** 2);
-    this.getDistance = function (vec) {
-        let x = this.x - vec.x;
-        let y = this.y - vec.y;
-        return Math.sqrt(x ** x + y ** 2);
-    };
+function setup() {
+    const button = document.querySelector("#mainBut");
+    button.addEventListener("click", (e) => {
+        console.log(new Sticker("cum"));
+    });
+}
+
+function createTestDiv() {
+    const div = document.createElement("div");
+    const body = document.querySelector("body");
+    div.classList.add("test");
+    div.style.cssText = "color: blue;";
+    body.appendChild(div);
+}
+
+function switchState(willHide) {
+    const div = document.querySelector(".test");
+    div || createTestDiv();
+    div.style.cssText =
+        "transition: all 2s ease; position: absolute; left: 10vw;";
 }
 
 // Gets coordinates at which this vector intersects with the viewport
@@ -56,6 +66,18 @@ function getRandDistance(max) {
     return Math.max(Math.random(), Math.random() + 0.15) * max;
 }
 
+function Vector(x, y) {
+    this.x = Number(x) || Math.random() * 2 - 1;
+    this.y = Number(y) || Math.random() * 2 - 1;
+    // Gets distance to another vector
+    this.length = Math.sqrt(this.x ** 2 + this.y ** 2);
+    this.getDistance = function (vec) {
+        let x = this.x - vec.x;
+        let y = this.y - vec.y;
+        return Math.sqrt(x ** x + y ** 2);
+    };
+}
+
 function Sticker(path, vector, offset) {
     this.path = path;
     this.vector = vector || new Vector();
@@ -68,28 +90,6 @@ function Sticker(path, vector, offset) {
             Math.random * (this.limit.length - this.dist1),
             Math.random * (this.limit.length - this.dist1)
         );
-}
-
-function setup() {
-    const button = document.querySelector("#mainBut");
-    button.addEventListener("click", (e) => {
-        console.log(new Sticker("cum"));
-    });
-}
-
-function createTestDiv() {
-    const div = document.createElement("div");
-    const body = document.querySelector("body");
-    div.classList.add("test");
-    div.style.cssText = "color: blue;";
-    body.appendChild(div);
-}
-
-function switchState(willHide) {
-    const div = document.querySelector(".test");
-    div || createTestDiv();
-    div.style.cssText =
-        "transition: all 2s ease; position: absolute; left: 10vw;";
 }
 
 setup();
