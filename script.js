@@ -69,18 +69,23 @@ function getRandDistance(max) {
 function Vector(x, y) {
     this.x = Number(x) || Math.random() * 2 - 1;
     this.y = Number(y) || Math.random() * 2 - 1;
-    // Gets distance to another vector
     this.length = Math.sqrt(this.x ** 2 + this.y ** 2);
+    // Gets distance to another vector
     this.getDistance = function (vec) {
         let x = this.x - vec.x;
         let y = this.y - vec.y;
         return Math.sqrt(x ** x + y ** 2);
+    };
+    // Returns a collinear unit vector
+    this.unitVector = function () {
+        return new Vector(this.x / this.length, this.y / this.length);
     };
 }
 
 function Sticker(path, vector, offset) {
     this.path = path;
     this.vector = vector || new Vector();
+    this.vector = this.vector.unitVector();
     this.limit = getLimit(this.vector, viewport);
     this.dist1 = getRandDistance(this.limit.length);
     this.dist2 = this.dist1 + this.limit.length;
